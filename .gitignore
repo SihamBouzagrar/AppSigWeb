@@ -1,0 +1,50 @@
+# .gitignore pour ASP.NET Core
+
+# Dossiers de build et compilation
+bin/
+obj/
+out/
+
+# Dossiers de développement
+.vscode/
+.idea/
+*.user
+*.suo
+*.userprefs
+
+# Fichiers de logs et temporaires
+*.log
+logs/
+
+# Base de données locale (si tu utilises SQLite)
+*.db
+*.sqlite
+
+# Fichiers de configuration sensibles
+appsettings.*.json
+!appsettings.json
+!appsettings.Development.json
+
+# Dossiers générés par Entity Framework
+Migrations/  # ← À supprimer si tu veux versionner tes migrations
+
+# Dossiers de publication
+publish/
+PublishOutput/
+
+# Visual Studio
+.vs/
+**/.vs/
+
+# NuGet
+packages/
+*.nupkg
+
+# Autres fichiers temporaires
+*.DS_Store
+Thumbs.db
+
+# wwwroot si tu as des fichiers générés (ex: bundling)
+wwwroot/lib/
+wwwroot/css/bundle*
+wwwroot/js/bundle*

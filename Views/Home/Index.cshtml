@@ -1,0 +1,57 @@
+﻿@{
+    ViewData["Title"] = "Accueil";
+}
+
+<div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+
+    <div class="hero-imgs">
+        <div class="hero-img-tile"></div>
+        <div class="hero-img-tile"></div>
+        <div class="hero-img-tile"></div>
+        <div class="hero-img-tile"></div>
+    </div>
+
+    <div class="hero-content">
+        <p class="hero-eyebrow">Hôtels de luxe au Maroc</p>
+        <h1 class="hero-title">
+            Séjournez dans les plus<br />
+            <em>beaux palaces</em> du Maroc
+        </h1>
+        <p class="hero-subtitle">
+            Réservez votre escapade dans nos hôtels sélectionnés à Marrakech, Casablanca, Fès et bien plus.
+        </p>
+
+       
+        <form method="get" asp-controller="Hotels" asp-action="Index">
+            <div class="search-bar">
+
+                <div class="search-field">
+                    <span class="sf-label">Destination</span>
+                    <input class="search-input" type="text" name="city" placeholder="Marrakech, Fès…" />
+                </div>
+
+                <div class="search-field">
+                    <span class="sf-label">Arrivée</span>
+                    <input class="search-input" type="date" name="checkIn"
+                           value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="search-field">
+                    <span class="sf-label">Départ</span>
+                    <input class="search-input" type="date" name="checkOut"
+                           value="@DateTime.Today.AddDays(3).ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="search-field" style="max-width: 110px;">
+                    <span class="sf-label">Voyageurs</span>
+                    <input class="search-input" type="number" name="guests" value="2" min="1" max="10" />
+                </div>
+
+                <button type="submit" class="search-submit">Rechercher</button>
+            </div>
+        </form>
+
+    </div>
+</div>

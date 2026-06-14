@@ -1,0 +1,49 @@
+@{
+    ViewData["Title"] = "Réservation Confirmée";
+}
+
+<div class="section" style="min-height: 70vh; display:flex; align-items:center; justify-content:center; text-align:center;">
+    <div style="max-width: 460px;">
+        <div style="width:72px; height:72px; border:2px solid var(--gold); border-radius:50%;
+                    display:flex; align-items:center; justify-content:center;
+                    margin:0 auto 32px; font-size:1.8rem; color:var(--gold);">
+            ✓
+        </div>
+        <p class="section-eyebrow" style="margin-bottom: 16px;">Réservation Confirmée</p>
+        <h1 class="section-title" style="margin-bottom: 20px;">Tout est prêt !</h1>
+        <p style="color:var(--muted); line-height:1.8; font-size:.95rem; margin-bottom:12px;">
+            Votre réservation a bien été enregistrée.<br />
+            Un récapitulatif vous sera envoyé par e-mail.
+        </p>
+        
+        <div class="modal-info-item" style="display:inline-block; margin:24px auto 40px; padding:14px 40px; background:var(--card); border:1px solid var(--border); border-radius:8px;">
+            <p class="mii-label">Numéro de Réservation</p>
+            <p class="mii-value" style="font-size:1.5rem; letter-spacing:.14em; color:var(--gold);">
+                #@ViewBag.ReservationId
+            </p>
+        </div>
+<a asp-controller="Reservations" asp-action="MyReservations" class="nav-link">
+    Mes Réservations
+</a>
+<div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:30px;">
+    <a asp-controller="Reservations" asp-action="MyReservations" 
+       class="search-submit" style="padding:14px 32px;">
+        Voir Mes Réservations
+    </a>
+    <a asp-controller="Hotels" asp-action="Index" class="secondary-btn">
+        Réserver un autre hôtel
+    </a>
+</div>
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+            <a asp-controller="Home" asp-action="Index" class="search-submit" style="text-decoration:none; padding:14px 32px;">
+                Retour à l'Accueil
+            </a>
+            <a asp-controller="Hotels" asp-action="Index" 
+               style="display:inline-flex; align-items:center; border:1px solid var(--border); color:var(--muted); text-decoration:none; font-size:.82rem; letter-spacing:.08em; text-transform:uppercase; padding:14px 32px; transition: border-color .2s;"
+               onmouseover="this.style.borderColor='var(--gold)'"
+               onmouseout="this.style.borderColor='var(--border)'">
+                Voir d'autres Hôtels
+            </a>
+        </div>
+    </div>
+</div>

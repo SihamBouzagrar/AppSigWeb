@@ -1,0 +1,43 @@
+@model List<ReservationHotel.DTOs.ReservationConfirmDto>
+
+@{
+    ViewData["Title"] = "Mes Réservations";
+}
+
+<div class="section">
+    <div class="section-header">
+        <h2 class="section-title">Mes Réservations</h2>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <p style="text-align:center; padding:80px 20px; font-size:1.1rem; color:var(--muted);">
+            Vous n'avez encore aucune réservation.<br>
+            <a asp-controller="Hotels" asp-action="Index">Commencer à réserver →</a>
+        </p>
+    }
+    else
+    {
+        <div class="hotel-grid">
+            @foreach (var res in Model)
+            {
+                <div class="hotel-card">
+                    <div class="card-body">
+                        <h3>#@res.Id - @res.RoomType</h3>
+                        <p style="color:var(--gold); font-weight:600; margin-bottom:8px;">
+                            @res.HotelName
+                        </p>
+                        <p>
+                            <strong>@res.CheckIn.ToString("dd MMM yyyy")</strong> → 
+                            <strong>@res.CheckOut.ToString("dd MMM yyyy")</strong>
+                        </p>
+                        <p>@res.Guests voyageur(s) • @res.Nights nuit(s)</p>
+                        <p style="font-size:1.3rem; color:var(--gold); font-weight:600; margin-top:12px;">
+                            @res.TotalPrice.ToString("N0") MAD
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

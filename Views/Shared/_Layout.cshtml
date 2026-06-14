@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - LuxeStay</title>
+    <script type="importmap"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/HotelReservation.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav>
+            <a class="nav-logo" asp-controller="Home" asp-action="Index">
+                Luxe<em>Stay</em>
+            </a>
+            <ul class="nav-links">
+                <li><a asp-controller="Home" asp-action="Index">Accueil</a></li>
+                <li><a asp-controller="Hotels" asp-action="Index">Hôtels</a></li>
+                <li><a asp-controller="Reservations" asp-action="MyReservations">Mes Réservations</a></li>
+                <li><a asp-controller="Reservations" asp-action="Create">Réserver</a></li>
+            </ul>
+
+            <a asp-controller="Hotels" asp-action="Index" class="nav-btn">
+                Explorer
+            </a>
+        </nav>
+    </header>
+
+    <div class="page-wrapper">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer>
+        <div class="footer-brand">
+            <span class="nav-logo" style="display:block; margin-bottom:16px;">Luxe<em>Stay</em></span>
+            <p class="footer-desc">
+                Hôtels de luxe soigneusement sélectionnés à travers le Maroc.<br>
+                Réservez en toute confiance.
+            </p>
+        </div>
+
+        <div class="footer-col">
+            <h4>Navigation</h4>
+            <ul>
+                <li><a asp-controller="Home" asp-action="Index">Accueil</a></li>
+                <li><a asp-controller="Hotels" asp-action="Index">Tous les hôtels</a></li>
+                <li><a asp-controller="Reservations" asp-action="MyReservations">Mes Réservations</a></li>
+                <li><a asp-controller="Reservations" asp-action="Create">Réserver</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Destinations</h4>
+            <ul>
+                <li><a href="#">Marrakech</a></li>
+                <li><a href="#">Casablanca</a></li>
+                <li><a href="#">Fès</a></li>
+                <li><a href="#">Essaouira</a></li>
+                <li><a href="#">Agadir</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Légal</h4>
+            <ul>
+                <li><a asp-area="" asp-controller="Home" asp-action="Privacy">Confidentialité</a></li>
+                <li><a href="#">Conditions d'utilisation</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-bottom" style="grid-column: 1 / -1;">
+            <span>&copy; 2026 LuxeStay — Tous droits réservés.</span>
+            <span>Fait avec soin au Maroc 🇲🇦</span>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,127 @@
+@model ReservationHotel.DTOs.HotelDetailsDto
+
+@{
+    ViewData["Title"] = Model.Nom;
+    var image = Model.Images?.FirstOrDefault()
+                ?? "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1200&q=80";
+}
+
+<div class="section" style="padding-top: 100px;">
+
+   
+    <div class="hotel-hero-image" style="margin-bottom: 48px;">
+        <img src="@image" alt="@Model.Nom" />
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 48px; align-items: start;">
+
+        
+        <div>
+            <p class="section-eyebrow">@Model.Ville</p>
+            <h1 class="section-title" style="margin-bottom: 20px;">@Model.Nom</h1>
+            <p style="color: var(--muted); line-height: 1.8; font-size: .95rem; max-width: 580px;">
+                @Model.Description
+            </p>
+
+            <div style="margin-top: 52px;">
+                <p class="section-eyebrow" style="margin-bottom: 24px;">Chambres disponibles</p>
+
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+
+                    @foreach (var room in Model.Rooms.Where(r => r.IsAvailable))
+                    {
+                        <div class="room-row">
+                            <div class="room-info">
+                                <span class="room-type">@room.RoomType</span>
+                                <span class="room-capacity">Jusqu'à @room.Capacity personnes</span>
+                            </div>
+                            <div class="room-price-col">
+                                <span class="price">@room.PricePerNight.ToString("N0") MAD</span>
+                                <span style="font-size:.72rem; color:var(--muted);">/ nuit</span>
+                            </div>
+                            <a asp-controller="Reservations"
+                               asp-action="Create"
+                               asp-route-roomId="@room.Id"
+                               asp-route-checkIn="@ViewBag.CheckIn"
+                               asp-route-checkOut="@ViewBag.CheckOut"
+                               asp-route-guests="@ViewBag.Guests"
+                               class="btn-reserve">
+                                Réserver
+                            </a>
+                        </div>
+                    }
+
+                    @if (!Model.Rooms.Any(r => r.IsAvailable))
+                    {
+                        <p style="color: var(--muted); font-size: .9rem;">
+                            Aucune chambre disponible pour le moment.
+                        </p>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+      
+        <div class="booking-summary-card">
+            <p class="section-eyebrow" style="margin-bottom: 16px;">Votre Séjour</p>
+            <div class="modal-info-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="modal-info-item">
+                    <p class="mii-label">Arrivée</p>
+                    <p class="mii-value">
+                        @(ViewBag.CheckIn is DateTime ci ? ci.ToString("dd MMM yyyy") : "—")
+                    </p>
+                </div>
+                <div class="modal-info-item">
+                    <p class="mii-label">Départ</p>
+                    <p class="mii-value">
+                        @(ViewBag.CheckOut is DateTime co ? co.ToString("dd MMM yyyy") : "—")
+                    </p>
+                </div>
+                <div class="modal-info-item">
+                    <p class="mii-label">Voyageurs</p>
+                    <p class="mii-value">@(ViewBag.Guests > 0 ? ViewBag.Guests.ToString() : "—")</p>
+                </div>
+                <div class="modal-info-item">
+                    <p class="mii-label">Chambres dispo</p>
+                    <p class="mii-value">@Model.Rooms.Count(r => r.IsAvailable)</p>
+                </div>
+            </div>
+            <a asp-controller="Hotels" asp-action="Index"
+               class="nav-btn"
+               style="display:block; text-align:center; text-decoration:none; padding: 14px; margin-top: 8px;">
+                ← Retour aux hôtels
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+    .room-row {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 18px 22px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        transition: border-color .2s;
+    }
+    .room-row:hover { border-color: var(--gold); }
+    .room-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .room-type { font-size: .95rem; font-weight: 600; color: var(--white); }
+    .room-capacity { font-size: .72rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+    .room-price-col { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; white-space: nowrap; }
+    .booking-summary-card {
+        position: sticky;
+        top: 100px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        padding: 28px;
+    }
+    @@media (max-width: 900px) {
+        [style*="grid-template-columns: 1fr 340px"] { grid-template-columns: 1fr !important; }
+        .booking-summary-card { position: static; }
+    }
+</style>

@@ -1,0 +1,64 @@
+@model ReservationHotel.ViewModels.ReservationCreateViewModel
+@{
+    ViewData["Title"] = "Confirmer la réservation";
+}
+
+<div class="section" style="max-width: 580px; margin: 0 auto; padding-top: 120px;">
+    <p class="section-eyebrow">Presque terminé</p>
+    <h1 class="section-title" style="margin-bottom: 40px;">Confirmez votre réservation</h1>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div style="border: 1px solid var(--red); padding: 16px; margin-bottom: 28px; color: var(--red); font-size: .88rem;">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <p>@error.ErrorMessage</p>
+            }
+        </div>
+    }
+
+    <form method="post" asp-controller="Reservations" asp-action="Create">
+        @Html.AntiForgeryToken()
+        
+        <input type="hidden" asp-for="RoomId" />
+
+        <div style="display: grid; gap: 20px; margin-bottom: 32px;">
+            <div class="form-field">
+                <label class="sf-label" asp-for="CheckIn">Date d'arrivée</label>
+                <input type="date" asp-for="CheckIn" />
+                <span asp-validation-for="CheckIn" style="color:var(--red); font-size:.78rem;"></span>
+            </div>
+
+            <div class="form-field">
+                <label class="sf-label" asp-for="CheckOut">Date de départ</label>
+                <input type="date" asp-for="CheckOut" />
+                <span asp-validation-for="CheckOut" style="color:var(--red); font-size:.78rem;"></span>
+            </div>
+
+            <div class="form-field">
+                <label class="sf-label" asp-for="Guests">Nombre de voyageurs</label>
+                <input type="number" asp-for="Guests" min="1" max="10" />
+                <span asp-validation-for="Guests" style="color:var(--red); font-size:.78rem;"></span>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+            <button type="submit" class="search-submit" style="flex:1; padding: 16px; font-size:.88rem;">
+                Confirmer la Réservation
+            </button>
+            <a asp-controller="Hotels" asp-action="Index"
+               style="flex:1; display:flex; align-items:center; justify-content:center;
+                      border:1px solid var(--border); color:var(--muted); text-decoration:none;
+                      font-size:.82rem; letter-spacing:.08em; text-transform:uppercase; padding:16px;
+                      transition: border-color .2s;"
+               onmouseover="this.style.borderColor='var(--gold)'"
+               onmouseout="this.style.borderColor='var(--border)'">
+                Annuler
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
