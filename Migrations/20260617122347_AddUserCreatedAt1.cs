@@ -6,14 +6,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HotelReservation.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCreatedAtToReservation : Migration
+    public partial class AddUserCreatedAt1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedAt",
-                table: "Reservations",
+                table: "AspNetUsers",
                 type: "datetime2",
                 nullable: false,
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
@@ -24,7 +24,7 @@ namespace HotelReservation.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "CreatedAt",
-                table: "Reservations");
+                table: "AspNetUsers");
         }
     }
 }

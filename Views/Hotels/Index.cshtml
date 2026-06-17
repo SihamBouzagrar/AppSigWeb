@@ -8,56 +8,59 @@
         </div>
     </div>
 
-
     <div class="hotel-grid">
         @foreach (var hotel in Model)
         {
-            var imageUrl = hotel.Images?.FirstOrDefault() 
+            var imageUrl = hotel.Images?.FirstOrDefault()
                 ?? "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80";
 
             <div class="hotel-card">
                 <div class="card-img">
                     <img src="@imageUrl" alt="@hotel.Nom" />
                     <span class="card-badge">Featured</span>
+
                     <span class="card-avail">
                         <span class="avail-dot available"></span>
                         Disponible
                     </span>
                 </div>
+
                 <div class="card-body">
                     <div class="card-location">@hotel.Ville</div>
                     <div class="card-name">@hotel.Nom</div>
                     <div class="card-desc">@hotel.Description</div>
 
-                    <div style="display: flex; gap: 8px; margin-top: 12px;">
-                        <a asp-controller="Hotels" asp-action="Details" asp-route-id="@hotel.Id"
+                    <div style="display:flex; gap:8px; margin-top:12px;">
+                        <a asp-controller="Hotels"
+                           asp-action="Details"
+                           asp-route-id="@hotel.Id"
                            class="card-btn secondary">
                             Voir Détails
                         </a>
 
-                     @if (hotel.Rooms != null && hotel.Rooms.Any(r => r.IsAvailable))
-{
-    var roomToBook = hotel.Rooms.Where(r => r.IsAvailable)
+                        @if (hotel.Rooms != null && hotel.Rooms.Any())
+                        {
+                            var roomToBook = hotel.Rooms
                                 .OrderBy(r => r.PricePerNight)
                                 .First();
 
-    <a asp-controller="Reservations"
-       asp-action="Create"
-       asp-route-roomId="@roomToBook.Id"
-       asp-route-checkIn="@ViewBag.CheckIn?.ToString("yyyy-MM-dd")"
-       asp-route-checkOut="@ViewBag.CheckOut?.ToString("yyyy-MM-dd")"
-       asp-route-guests="@ViewBag.Guests"
-       class="card-btn">
-        Réserver maintenant
-    </a>
-}
-else
-{
-    <span class="card-btn" style="background:#555; cursor:not-allowed;">
-        Pas de chambre disponible
-    </span>
-}
-  </div>
+                            <a asp-controller="Reservations"
+                               asp-action="Create"
+                               asp-route-roomId="@roomToBook.Id"
+                               asp-route-checkIn="@ViewBag.CheckIn?.ToString("yyyy-MM-dd")"
+                               asp-route-checkOut="@ViewBag.CheckOut?.ToString("yyyy-MM-dd")"
+                               asp-route-guests="@ViewBag.Guests"
+                               class="card-btn">
+                                Réserver maintenant
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="card-btn" style="background:#555; cursor:not-allowed;">
+                                Pas de chambre disponible
+                            </span>
+                        }
+                    </div>
                 </div>
             </div>
         }

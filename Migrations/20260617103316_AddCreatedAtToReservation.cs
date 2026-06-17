@@ -5,7 +5,7 @@
 namespace HotelReservation.Migrations
 {
     /// <inheritdoc />
-    public partial class Addrooms : Migration
+    public partial class AddCreatedAtToReservation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

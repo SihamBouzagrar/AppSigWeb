@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - LuxeStay</title>
-    <script type="importmap"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -14,20 +13,70 @@
 </head>
 <body>
     <header>
-        <nav>
-            <a class="nav-logo" asp-controller="Home" asp-action="Index">
-                Luxe<em>Stay</em>
-            </a>
-            <ul class="nav-links">
-                <li><a asp-controller="Home" asp-action="Index">Accueil</a></li>
-                <li><a asp-controller="Hotels" asp-action="Index">Hôtels</a></li>
-                <li><a asp-controller="Reservations" asp-action="MyReservations">Mes Réservations</a></li>
-                <li><a asp-controller="Reservations" asp-action="Create">Réserver</a></li>
-            </ul>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="nav-logo navbar-brand" asp-controller="Home" asp-action="Index">
+                    Luxe<em>Stay</em>
+                </a>
 
-            <a asp-controller="Hotels" asp-action="Index" class="nav-btn">
-                Explorer
-            </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Accueil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Hotels" asp-action="Index">Hôtels</a>
+                        </li>
+                    </ul>
+
+                    <!-- Menu Authentification -->
+                    <ul class="navbar-nav">
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+            @User.Identity.Name
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" asp-controller="Reservations" asp-action="MyReservations">Mes Réservations</a></li>
+            
+            @if (User.IsInRole("Admin"))
+            {
+                <li><a class="dropdown-item" asp-controller="AdminReservation" asp-action="Index">Toutes les Réservations</a></li>
+                <li><a class="dropdown-item" asp-controller="AdminUser" asp-action="Index">Liste des Clients</a></li>
+            }
+            
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <!-- FORMULAIRE POST pour Logout -->
+                <form asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="dropdown-item text-danger">
+                        <i class="bi bi-box-arrow-right"></i> Déconnexion
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </li>
+}
+else
+{
+    <!-- Boutons quand non connecté -->
+    <li class="nav-item">
+        <a class="nav-link" asp-controller="Account" asp-action="Login">Se connecter</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link btn btn-outline-light ms-2" asp-controller="Account" asp-action="Register">S'inscrire</a>
+    </li>
+}
+     
+                    </ul>
+                </div>
+            </div>
         </nav>
     </header>
 
@@ -45,39 +94,18 @@
                 Réservez en toute confiance.
             </p>
         </div>
-
+        <!-- Le reste de ton footer reste identique -->
         <div class="footer-col">
             <h4>Navigation</h4>
             <ul>
                 <li><a asp-controller="Home" asp-action="Index">Accueil</a></li>
                 <li><a asp-controller="Hotels" asp-action="Index">Tous les hôtels</a></li>
                 <li><a asp-controller="Reservations" asp-action="MyReservations">Mes Réservations</a></li>
-                <li><a asp-controller="Reservations" asp-action="Create">Réserver</a></li>
             </ul>
         </div>
-
-        <div class="footer-col">
-            <h4>Destinations</h4>
-            <ul>
-                <li><a href="#">Marrakech</a></li>
-                <li><a href="#">Casablanca</a></li>
-                <li><a href="#">Fès</a></li>
-                <li><a href="#">Essaouira</a></li>
-                <li><a href="#">Agadir</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-col">
-            <h4>Légal</h4>
-            <ul>
-                <li><a asp-area="" asp-controller="Home" asp-action="Privacy">Confidentialité</a></li>
-                <li><a href="#">Conditions d'utilisation</a></li>
-            </ul>
-        </div>
-
+        <!-- ... autres colonnes du footer ... -->
         <div class="footer-bottom" style="grid-column: 1 / -1;">
             <span>&copy; 2026 LuxeStay — Tous droits réservés.</span>
-            <span>Fait avec soin au Maroc 🇲🇦</span>
         </div>
     </footer>
 

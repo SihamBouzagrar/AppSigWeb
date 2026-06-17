@@ -1,0 +1,161 @@
+@model IEnumerable<ReservationHotel.Models.Reservation>
+
+<style>
+    body {
+        background: #0f172a;
+    }
+
+    .admin-container {
+        padding: 40px;
+        color: white;
+    }
+
+    .admin-title {
+        font-size: 26px;
+        font-weight: 600;
+        margin-bottom: 25px;
+        color: #f9fafb;
+    }
+
+    .table {
+        background: #111827;
+        color: white;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    thead {
+        background: #1f2937;
+        color: #f9fafb;
+    }
+
+    tbody tr:hover {
+        background: #1f2937;
+    }
+
+    .badge {
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+    }
+
+    .badge-success { background: #16a34a; }
+    .badge-danger { background: #dc2626; }
+    .badge-warning { background: #f59e0b; color: #111827; }
+
+    .btn-action {
+        border: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-right: 5px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-approve {
+        background: #16a34a;
+        color: white;
+    }
+
+    .btn-approve:hover {
+        background: #15803d;
+    }
+
+    .btn-reject {
+        background: #dc2626;
+        color: white;
+    }
+
+    .btn-reject:hover {
+        background: #b91c1c;
+    }
+
+    .empty {
+        text-align: center;
+        padding: 20px;
+        color: #9ca3af;
+    }
+</style>
+
+<div class="admin-container">
+
+    <div class="admin-title">📋 Gestion des Réservations</div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Client</th>
+                <th>Hôtel / Chambre</th>
+                <th>Dates</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="5" class="empty">Aucune réservation</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.User?.FullName</td>
+                    <td>@item.Room?.Hotel?.Nom - @item.Room?.RoomType</td>
+                    <td>
+                        @item.CheckIn.ToShortDateString()
+                        →
+                        @item.CheckOut.ToShortDateString()
+                    </td>
+
+                    <td>
+                        @if (item.Status == ReservationStatus.Confirmed)
+                        {
+                            <span class="badge badge-success">Confirmée</span>
+                        }
+                        else if (item.Status == ReservationStatus.Rejected)
+                        {
+                            <span class="badge badge-danger">Refusée</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-warning">En attente</span>
+                        }
+                    </td>
+
+                    <td>
+                        @if (item.Status == ReservationStatus.Pending)
+                        {
+                            <form asp-action="Approve" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn-action btn-approve">
+                                    ✔ Approuver
+                                </button>
+                            </form>
+
+                            <form asp-action="Reject" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn-action btn-reject">
+                                    ✖ Refuser
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span style="color:#9ca3af; font-size:13px;">
+                                Action non disponible
+                            </span>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+
+</div>

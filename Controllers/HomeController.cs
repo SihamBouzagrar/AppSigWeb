@@ -19,10 +19,12 @@ namespace HotelReservation.Controllers
         // ✅ FIX: HomeController.Index ne doit PAS retourner la liste des hôtels —
         //         c'est le rôle de HotelsController.Index.
         //         La page d'accueil passe juste les paramètres de recherche à l'API.
-        public IActionResult Index()
-        {
-            return View();
-        }
+       public async Task<IActionResult> Index()
+    {
+        var hotels = await _hotelService.GetAllHotelDtosAsync();
+        return View(hotels);
+    }
+        
 
         // GET /Home/Error
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -33,5 +35,6 @@ namespace HotelReservation.Controllers
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
             });
         }
+
     }
 }

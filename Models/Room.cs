@@ -10,9 +10,8 @@ namespace ReservationHotel.Models
 
         public int Capacity { get; set; }
 
-        public bool IsAvailable { get; set; }
-
-        public int HotelId { get; set; }
+      
+      public int AvailableCount { get; set; }
 
         public Hotel? Hotel { get; set; }
 

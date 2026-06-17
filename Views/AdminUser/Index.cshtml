@@ -1,0 +1,24 @@
+@model IEnumerable<ReservationHotel.Models.ApplicationUser>
+
+<h2>Liste des Clients</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Date d'inscription</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.FullName</td>
+                <td>@user.Email</td>
+                <td>@user.CreatedAt.ToString("dd/MM/yyyy")</td>
+                
+            </tr>
+        }
+    </tbody>
+</table>

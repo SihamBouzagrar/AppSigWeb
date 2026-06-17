@@ -578,3 +578,5 @@ C:\Users\User\OneDrive\Documents\HotelReservation\obj\Debug\net10.0\refint\Hotel
 C:\Users\User\OneDrive\Documents\HotelReservation\obj\Debug\net10.0\HotelReservation.pdb
 C:\Users\User\OneDrive\Documents\HotelReservation\obj\Debug\net10.0\HotelReservation.genruntimeconfig.cache
 C:\Users\User\OneDrive\Documents\HotelReservation\obj\Debug\net10.0\ref\HotelReservation.dll
+C:\Users\User\OneDrive\Documents\HotelReservation\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.Google.dll
+C:\Users\User\OneDrive\Documents\HotelReservation\bin\Debug\net10.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll

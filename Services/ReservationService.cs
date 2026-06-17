@@ -1,3 +1,4 @@
+using HotelReservation.Models;
 using Microsoft.EntityFrameworkCore;
 using ReservationHotel.Data;
 using ReservationHotel.DTOs;
@@ -14,60 +15,82 @@ namespace ReservationHotel.Services
             _context = context;
         }
 
-        // ─────────────────────────────────────────────────────────────
-        // Vérifie la disponibilité d'une chambre sur une plage de dates
-        // ✅ FIX: validation des paramètres ajoutée
-        // ─────────────────────────────────────────────────────────────
-        public async Task<bool> IsRoomAvailable(int roomId, DateTime checkIn, DateTime checkOut)
-        {
-            if (roomId <= 0 || checkIn >= checkOut)
-                return false;
+        // Vérifie la disponibilité d'une chambre
+       public async Task<bool> IsRoomAvailable(
+    int roomId,
+    DateTime checkIn,
+    DateTime checkOut)
+{
+    var conflict = await _context.Reservations.AnyAsync(r =>
+        r.RoomId == roomId &&
+        r.Status != ReservationStatus.Rejected &&
+        checkIn < r.CheckOut &&
+        checkOut > r.CheckIn);
 
-            // Vérifie qu'aucune réservation existante ne chevauche la période demandée
-            var hasConflict = await _context.Reservations.AnyAsync(r =>
-                r.RoomId == roomId &&
-                checkIn < r.CheckOut &&
-                checkOut > r.CheckIn
-            );
+    return !conflict;
+}
 
-            return !hasConflict;
-        }
-// Récupérer toutes les réservations (avec info chambre + hôtel)
-public async Task<List<ReservationConfirmDto>> GetAllReservationsAsync()
+        // ✅ NOUVELLE MÉTHODE : Récupérer les réservations d'un client
+// Récupérer les réservations d'un client
+public async Task<List<ReservationConfirmDto>> GetUserReservationsAsync(string userId)
 {
     return await _context.Reservations
         .Include(r => r.Room)
-            .ThenInclude(room => room!.Hotel)   // Important pour charger l'hôtel
+            .ThenInclude(room => room!.Hotel)
+        .Include(r => r.User)
+        .Where(r => r.UserId == userId)
         .OrderByDescending(r => r.CheckIn)
         .Select(r => new ReservationConfirmDto
         {
             Id = r.Id,
             RoomId = r.RoomId,
             RoomType = r.Room != null ? r.Room.RoomType : "Chambre inconnue",
-            HotelName = r.Room != null && r.Room.Hotel != null 
-                        ? r.Room.Hotel.Nom 
-                        : "Hôtel inconnu",
+            HotelName = r.Room != null && r.Room.Hotel != null ? r.Room.Hotel.Nom : "Hôtel inconnu",
+            UserFullName = r.User != null ? r.User.FullName : "Utilisateur inconnu",
             CheckIn = r.CheckIn,
             CheckOut = r.CheckOut,
             Guests = r.Guests,
             Nights = (r.CheckOut - r.CheckIn).Days,
-            TotalPrice = r.TotalPrice
+            TotalPrice = r.TotalPrice,
+            Status = r.Status.ToString()
         })
         .ToListAsync();
 }
 
-        // ─────────────────────────────────────────────────────────────
-        // Crée une réservation et retourne un DTO (pas l'entité brute)
-        // ✅ FIX 1: TotalPrice calculé automatiquement à partir du prix de la chambre
-        // ✅ FIX 2: retourne ReservationDto au lieu de Reservation (entité EF)
-        //           → évite d'exposer des champs internes via le contrôleur
-        // ✅ FIX 3: vérifie que la chambre existe avant de créer la réservation
-        // ─────────────────────────────────────────────────────────────
-        public async Task<ReservationConfirmDto> CreateReservation(
-            int roomId, DateTime checkIn, DateTime checkOut, int guests)
+// Récupérer toutes les réservations (Admin)
+public async Task<List<ReservationConfirmDto>> GetAllReservationsAsync()
+{
+    return await _context.Reservations
+        .Include(r => r.Room)
+            .ThenInclude(room => room!.Hotel)
+        .Include(r => r.User)
+        .OrderByDescending(r => r.CheckIn)
+        .Select(r => new ReservationConfirmDto
         {
-            var room = await _context.Rooms.FindAsync(roomId)
-                ?? throw new InvalidOperationException($"Chambre {roomId} introuvable.");
+            Id = r.Id,
+            RoomId = r.RoomId,
+            RoomType = r.Room != null ? r.Room.RoomType : "Chambre inconnue",
+            HotelName = r.Room != null && r.Room.Hotel != null ? r.Room.Hotel.Nom : "Hôtel inconnu",
+            UserFullName = r.User != null ? r.User.FullName : "Utilisateur inconnu",
+            CheckIn = r.CheckIn,
+            CheckOut = r.CheckOut,
+            Guests = r.Guests,
+            Nights = (r.CheckOut - r.CheckIn).Days,
+            TotalPrice = r.TotalPrice,
+            Status = r.Status.ToString()
+        })
+        .ToListAsync();
+}
+     // Créer une réservation (✅ Version corrigée avec UserId)
+        public async Task<ReservationConfirmDto> CreateReservation(
+            string userId, int roomId, DateTime checkIn, DateTime checkOut, int guests)
+        {
+            var room = await _context.Rooms
+                .Include(r => r.Hotel)
+                .FirstOrDefaultAsync(r => r.Id == roomId);
+
+            if (room == null)
+                throw new InvalidOperationException($"Chambre {roomId} introuvable.");
 
             int nights = (checkOut - checkIn).Days;
             if (nights <= 0)
@@ -75,28 +98,32 @@ public async Task<List<ReservationConfirmDto>> GetAllReservationsAsync()
 
             var reservation = new Reservation
             {
+                UserId = userId,
                 RoomId = roomId,
                 CheckIn = checkIn,
                 CheckOut = checkOut,
                 Guests = guests,
-                // ✅ FIX: TotalPrice calculé ici, plus besoin de le faire côté contrôleur
-                TotalPrice = room.PricePerNight * nights
+                TotalPrice = room.PricePerNight * nights,
+                Status = ReservationStatus.Pending,
+                CreatedAt = DateTime.UtcNow
             };
 
             _context.Reservations.Add(reservation);
             await _context.SaveChangesAsync();
 
-            return new ReservationConfirmDto
-            {
-                Id = reservation.Id,
-                RoomId = roomId,
-                RoomType = room.RoomType,
-                CheckIn = checkIn,
-                CheckOut = checkOut,
-                Guests = guests,
-                Nights = nights,
-                TotalPrice = reservation.TotalPrice
-            };
+           return new ReservationConfirmDto
+{
+    Id = reservation.Id,
+    RoomId = roomId,
+    RoomType = room.RoomType,
+    HotelName = room.Hotel != null ? room.Hotel.Nom : "Hôtel inconnu",
+    CheckIn = checkIn,
+    CheckOut = checkOut,
+    Guests = guests,
+    Nights = nights,
+    TotalPrice = reservation.TotalPrice,
+    Status = reservation.Status.ToString()
+};
         }
     }
 }

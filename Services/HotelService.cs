@@ -26,7 +26,7 @@ namespace ReservationHotel.Services
                     // CS8604 FIX : les collections sont initialisées dans Hotel.cs → plus jamais null
                     h.Rooms.Any(r =>
                         r.Capacity >= guests &&
-                        r.IsAvailable &&
+                        
                         !_context.Reservations.Any(res =>
                             res.RoomId == r.Id &&
                             checkIn < res.CheckOut &&
@@ -43,10 +43,10 @@ namespace ReservationHotel.Services
     .FirstOrDefault() ?? "/images/hotels/default.jpg",
                     // CS8604 FIX : (decimal?) cast évite le null sur Min() si aucune chambre
                     MinPricePerNight = h.Rooms
-                        .Where(r => r.IsAvailable && r.Capacity >= guests)
+                        .Where(r => r.Capacity >= guests)
                         .Min(r => (decimal?)r.PricePerNight) ?? 0,
                     AvailableRoomsCount = h.Rooms.Count(r =>
-                        r.IsAvailable &&
+                     
                         r.Capacity >= guests &&
                         !_context.Reservations.Any(res =>
                             res.RoomId == r.Id &&
@@ -75,7 +75,7 @@ public async Task<HotelDetailsDto?> GetHotelByIdAsync(int id)
                 RoomType = r.RoomType ?? "",
                 Capacity = r.Capacity,
                 PricePerNight = r.PricePerNight,
-                IsAvailable = r.IsAvailable
+               
             }).ToList()
         })
         .FirstOrDefaultAsync();
@@ -100,7 +100,7 @@ public async Task<List<HotelDetailsDto>> GetAllHotelDtosAsync()
                 RoomType = r.RoomType ?? "",
                 Capacity = r.Capacity,
                 PricePerNight = r.PricePerNight,
-                IsAvailable = r.IsAvailable
+               
             }).ToList()
         })
         .ToListAsync();

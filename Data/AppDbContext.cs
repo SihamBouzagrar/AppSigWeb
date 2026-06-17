@@ -1,13 +1,13 @@
-// CS0105 FIX : supprimé le 'using ReservationHotel.Models' en double
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ReservationHotel.Models;
 
 namespace ReservationHotel.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options)
-            : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
 
@@ -18,6 +18,15 @@ namespace ReservationHotel.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);   // ← Très important de garder ceci en premier
+
+            // ====================== FIX pour .NET 10 + Identity Passkeys ======================
+            modelBuilder.Ignore<IdentityPasskeyData>();
+            modelBuilder.Ignore<IdentityUserPasskey<string>>();
+
+            // =================================================================================
+
+            // Configurations de tes entités
             modelBuilder.Entity<Hotel>()
                 .Property(h => h.PrixParNuit)
                 .HasPrecision(18, 2);

@@ -28,7 +28,7 @@
 
                 <div style="display: flex; flex-direction: column; gap: 14px;">
 
-                    @foreach (var room in Model.Rooms.Where(r => r.IsAvailable))
+                   @foreach (var room in Model.Rooms)
                     {
                         <div class="room-row">
                             <div class="room-info">
@@ -51,7 +51,7 @@
                         </div>
                     }
 
-                    @if (!Model.Rooms.Any(r => r.IsAvailable))
+                   @if (!Model.Rooms.Any())
                     {
                         <p style="color: var(--muted); font-size: .9rem;">
                             Aucune chambre disponible pour le moment.
@@ -84,7 +84,7 @@
                 </div>
                 <div class="modal-info-item">
                     <p class="mii-label">Chambres dispo</p>
-                    <p class="mii-value">@Model.Rooms.Count(r => r.IsAvailable)</p>
+                    <p class="mii-value">@Model.Rooms.Count()</p>
                 </div>
             </div>
             <a asp-controller="Hotels" asp-action="Index"

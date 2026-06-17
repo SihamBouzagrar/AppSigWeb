@@ -22,20 +22,26 @@ public async Task<IActionResult> Index(string? search, string? city, DateTime? c
 {
     var query = _context.Hotels
         .Include(h => h.Images)
-        .Include(h => h.Rooms)          // ← C'est ÇA qui manque probablement
+        .Include(h => h.Rooms)
         .AsQueryable();
 
     if (!string.IsNullOrWhiteSpace(search))
     {
-        var term = search.ToLower();
-        query = query.Where(h => h.Nom.ToLower().Contains(term) ||
-                                h.Ville.ToLower().Contains(term) ||
-                                h.Description.ToLower().Contains(term));
+        var s = search.ToLower();
+
+        query = query.Where(h =>
+            (h.Nom ?? "").ToLower().Contains(s) ||
+            (h.Ville ?? "").ToLower().Contains(s) ||
+            (h.Description ?? "").ToLower().Contains(s));
     }
 
     if (!string.IsNullOrWhiteSpace(city))
     {
-        query = query.Where(h => h.Ville.ToLower().Contains(city.ToLower()));
+        var c = city.ToLower();
+
+        query = query.Where(h =>
+            (h.Ville ?? "").ToLower().Contains(c) ||
+            (h.Nom ?? "").ToLower().Contains(c));
     }
 
     var hotels = await query.ToListAsync();
@@ -53,8 +59,7 @@ public async Task<IActionResult> Index(string? search, string? city, DateTime? c
             Id = r.Id,
             RoomType = r.RoomType ?? "",
             Capacity = r.Capacity,
-            PricePerNight = r.PricePerNight,
-            IsAvailable = r.IsAvailable
+            PricePerNight = r.PricePerNight
         }).ToList() ?? new List<RoomDto>()
     }).ToList();
 
@@ -64,6 +69,7 @@ public async Task<IActionResult> Index(string? search, string? city, DateTime? c
 
     return View(hotelDtos);
 }
+
    // GET /Hotels/Details/5
         // ✅ FIX: supprimé [HttpGet("{id}")] qui cassait le routing MVC conventionnel
         public async Task<IActionResult> Details(int id,

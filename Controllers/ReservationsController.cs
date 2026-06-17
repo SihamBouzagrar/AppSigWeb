@@ -1,94 +1,97 @@
-using HotelReservation.Controllers;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ReservationHotel.Models;
 using ReservationHotel.Services;
 using ReservationHotel.ViewModels;
 
 namespace ReservationHotel.Controllers
 {
+    [Authorize(Roles = "Client")]   // Seulement les clients
     public class ReservationsController : Controller
     {
         private readonly ReservationService _reservationService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ReservationsController(ReservationService reservationService)
+        public ReservationsController(ReservationService reservationService, UserManager<ApplicationUser> userManager)
         {
             _reservationService = reservationService;
+            _userManager = userManager;
         }
 
-        // GET /Reservations/Create?roomId=3&checkIn=...&checkOut=...&guests=2
-       [HttpGet]
-public IActionResult Create(int roomId, DateTime checkIn, DateTime checkOut, int guests)
+        // GET: Reservations/Create
+        [HttpGet]
+        public IActionResult Create(int roomId, DateTime checkIn, DateTime checkOut, int guests = 1)
+        {
+            if (roomId <= 0 || checkIn < DateTime.Today || checkIn >= checkOut)
+                return BadRequest("Paramètres invalides.");
+
+            var model = new ReservationCreateViewModel
+            {
+                RoomId = roomId,
+                CheckIn = checkIn,
+                CheckOut = checkOut,
+                Guests = guests
+            };
+
+            return View(model);
+        }
+
+        // POST: Reservations/Create
+ [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Create(ReservationCreateViewModel model)
 {
-    if (roomId <= 0)
-        return BadRequest("Chambre invalide.");
+    // Validation des dates
+    if (model.CheckIn < DateTime.Today)
+        ModelState.AddModelError(nameof(model.CheckIn), "La date d'arrivée ne peut pas être dans le passé.");
 
-    if (checkIn < DateTime.Today || checkIn >= checkOut)
-        return BadRequest("Dates invalides.");
+    if (model.CheckIn >= model.CheckOut)
+        ModelState.AddModelError(nameof(model.CheckOut), "La date de départ doit être après l'arrivée.");
 
-    var model = new ReservationCreateViewModel
+    if (!ModelState.IsValid)
+        return View(model);
+
+    var user = await _userManager.GetUserAsync(User);
+    if (user == null) 
+        return Unauthorized();
+
+    // Vérifier la disponibilité
+    var available = await _reservationService.IsRoomAvailable(
+        model.RoomId, model.CheckIn, model.CheckOut);
+
+    if (!available)
     {
-        RoomId = roomId,
-        CheckIn = checkIn,
-        CheckOut = checkOut,
-        Guests = guests
-    };
+        ModelState.AddModelError("", "Cette chambre n'est pas disponible pour ces dates.");
+        return View(model);
+    }
 
-    // Optionnel : charger le nom de la chambre pour l'afficher
-    ViewBag.RoomInfo = "Chambre sélectionnée";
+    // Créer la réservation
+    var reservation = await _reservationService.CreateReservation(
+        user.Id, 
+        model.RoomId, 
+        model.CheckIn, 
+        model.CheckOut, 
+        model.Guests);
 
-    return View(model);
+    return RedirectToAction(nameof(Success), new { id = reservation.Id });
 }
+   // GET: Reservations/MyReservations
 [HttpGet]
 public async Task<IActionResult> MyReservations()
 {
-    var reservations = await _reservationService.GetAllReservationsAsync();
-    
+    var user = await _userManager.GetUserAsync(User);
+    if (user == null) 
+        return Unauthorized();
+
+    var reservations = await _reservationService.GetUserReservationsAsync(user.Id);
     return View(reservations);
 }
-        // POST /Reservations/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]  // ✅ FIX: protection CSRF ajoutée
-        public async Task<IActionResult> Create(ReservationCreateViewModel model)
-        {
-            // ✅ FIX: validation métier des dates en plus de ModelState
-            if (model.CheckIn < DateTime.Today)
-                ModelState.AddModelError(nameof(model.CheckIn), "La date d'arrivée ne peut pas être dans le passé.");
 
-            if (model.CheckIn >= model.CheckOut)
-                ModelState.AddModelError(nameof(model.CheckOut), "La date de départ doit être après la date d'arrivée.");
-
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var available = await _reservationService.IsRoomAvailable(
-                model.RoomId,
-                model.CheckIn,
-                model.CheckOut
-            );
-
-            if (!available)
-            {
-                ModelState.AddModelError("", "Cette chambre n'est pas disponible pour les dates sélectionnées.");
-                return View(model);
-            }
-
-            var reservation = await _reservationService.CreateReservation(
-                model.RoomId,
-                model.CheckIn,
-                model.CheckOut,
-                model.Guests
-            );
-
-            // ✅ FIX: Post-Redirect-Get pattern — RedirectToAction évite la soumission double si F5
-            return RedirectToAction(nameof(Success), new { id = reservation.Id });
-        }
-
-        // GET /Reservations/Success/12
+        // GET: Reservations/Success/5
         [HttpGet]
         public IActionResult Success(int id)
         {
-            if (id <= 0)
-                return RedirectToAction(nameof(HomeController.Index), "Home");
-
             ViewBag.ReservationId = id;
             return View();
         }
